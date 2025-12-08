@@ -34,11 +34,16 @@ export default function Hero() {
             >
               <Sparkles className="w-12 h-12 text-primary-500" />
             </motion.div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient">
+            <motion.h1 
+              className="text-5xl md:text-7xl font-bold mb-4"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.1 }}
+            >
+              <span className="bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-gradient inline-block">
                 Full Stack Developer
               </span>
-            </h1>
+            </motion.h1>
           </motion.div>
 
           <motion.p

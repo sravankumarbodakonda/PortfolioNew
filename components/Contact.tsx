@@ -158,7 +158,7 @@ export default function Contact() {
                   >
                     Name
                   </label>
-                  <input
+                  <motion.input
                     type="text"
                     id="name"
                     name="name"
@@ -167,6 +167,7 @@ export default function Contact() {
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all"
                     placeholder="Your Name"
+                    whileFocus={{ scale: 1.02, borderColor: 'rgb(59, 130, 246)' }}
                   />
                 </div>
 
@@ -177,7 +178,7 @@ export default function Contact() {
                   >
                     Email
                   </label>
-                  <input
+                  <motion.input
                     type="email"
                     id="email"
                     name="email"
@@ -186,6 +187,7 @@ export default function Contact() {
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all"
                     placeholder="your.email@example.com"
+                    whileFocus={{ scale: 1.02, borderColor: 'rgb(59, 130, 246)' }}
                   />
                 </div>
 
@@ -196,7 +198,7 @@ export default function Contact() {
                   >
                     Message
                   </label>
-                  <textarea
+                  <motion.textarea
                     id="message"
                     name="message"
                     value={formData.message}
@@ -205,24 +207,47 @@ export default function Contact() {
                     rows={6}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all resize-none"
                     placeholder="Tell me about your project..."
+                    whileFocus={{ scale: 1.02, borderColor: 'rgb(59, 130, 246)' }}
                   />
                 </div>
 
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  whileHover={{ scale: 1.02 }}
+                  className="w-full px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
+                  whileHover={{ scale: 1.02, boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4)' }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {isSubmitting ? (
-                    'Sending...'
-                  ) : (
-                    <>
-                      Send Message
-                      <Send className="w-5 h-5" />
-                    </>
-                  )}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-purple-600 to-primary-500"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6 }}
+                    style={{ zIndex: 0 }}
+                  />
+                  <span className="relative z-10 flex items-center gap-2">
+                    {isSubmitting ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                        >
+                          ⏳
+                        </motion.span>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <Send className="w-5 h-5" />
+                        </motion.div>
+                      </>
+                    )}
+                  </span>
                 </motion.button>
               </div>
             </form>

@@ -99,35 +99,58 @@ export default function Skills() {
             return (
               <motion.div
                 key={category.title}
-                initial={{ opacity: 0, y: 50 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
                 transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
                 className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all"
+                whileHover={{ y: -5, scale: 1.02 }}
               >
-                <div className="flex items-center mb-6">
-                  <div
+                <motion.div 
+                  className="flex items-center mb-6"
+                  whileHover={{ x: 5 }}
+                >
+                  <motion.div
                     className={`p-3 rounded-xl bg-gradient-to-r ${category.color} mr-4`}
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, delay: categoryIndex * 0.5 }}
                   >
                     <Icon className="w-6 h-6 text-white" />
-                  </div>
+                  </motion.div>
                   <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
                     {category.title}
                   </h3>
-                </div>
+                </motion.div>
                 <div className="space-y-4">
                   {category.skills.map((skill, skillIndex) => (
-                    <div key={skill.name}>
+                    <motion.div 
+                      key={skill.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={inView ? { opacity: 1, x: 0 } : {}}
+                      transition={{ 
+                        duration: 0.5, 
+                        delay: categoryIndex * 0.1 + skillIndex * 0.1 
+                      }}
+                      whileHover={{ x: 5 }}
+                    >
                       <div className="flex justify-between mb-2">
                         <span className="text-gray-700 dark:text-gray-300 font-medium">
                           {skill.name}
                         </span>
-                        <span className="text-primary-500 font-semibold">
+                        <motion.span 
+                          className="text-primary-500 font-semibold"
+                          initial={{ opacity: 0 }}
+                          animate={inView ? { opacity: 1 } : {}}
+                          transition={{ 
+                            duration: 0.5, 
+                            delay: categoryIndex * 0.1 + skillIndex * 0.1 + 0.5 
+                          }}
+                        >
                           {skill.level}%
-                        </span>
+                        </motion.span>
                       </div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative">
                         <motion.div
-                          className={`h-full bg-gradient-to-r ${category.color} rounded-full`}
+                          className={`h-full bg-gradient-to-r ${category.color} rounded-full relative`}
                           initial={{ width: 0 }}
                           animate={
                             inView
@@ -135,13 +158,26 @@ export default function Skills() {
                               : { width: 0 }
                           }
                           transition={{
-                            duration: 1,
+                            duration: 1.2,
                             delay: categoryIndex * 0.1 + skillIndex * 0.1,
                             ease: 'easeOut',
                           }}
-                        />
+                        >
+                          <motion.div
+                            className="absolute inset-0 bg-white/30 rounded-full"
+                            animate={{
+                              x: ['-100%', '100%'],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              repeatDelay: 1,
+                              delay: categoryIndex * 0.1 + skillIndex * 0.1 + 1,
+                            }}
+                          />
+                        </motion.div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </motion.div>

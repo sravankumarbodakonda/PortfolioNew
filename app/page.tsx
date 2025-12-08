@@ -8,6 +8,8 @@ import Skills from '@/components/Skills'
 import Contact from '@/components/Contact'
 import Navigation from '@/components/Navigation'
 import ParticleBackground from '@/components/ParticleBackground'
+import FloatingElements from '@/components/FloatingElements'
+import CursorTrail from '@/components/CursorTrail'
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -23,6 +25,8 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden">
       <ParticleBackground />
+      <FloatingElements />
+      <CursorTrail />
       <Navigation />
       <Hero />
       <About />

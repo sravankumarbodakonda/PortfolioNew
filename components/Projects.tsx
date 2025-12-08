@@ -96,13 +96,14 @@ export default function Projects() {
           {projects.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 50 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              initial={{ opacity: 0, y: 50, rotateY: -15 }}
+              animate={inView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all"
               onMouseEnter={() => setHoveredId(project.id)}
               onMouseLeave={() => setHoveredId(null)}
-              whileHover={{ y: -10 }}
+              whileHover={{ y: -10, scale: 1.02 }}
+              style={{ perspective: 1000 }}
             >
               <div className="relative h-48 overflow-hidden">
                 <motion.img
@@ -145,13 +146,20 @@ export default function Projects() {
                   {project.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span
+                  {project.tags.map((tag, tagIndex) => (
+                    <motion.span
                       key={tag}
-                      className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs rounded-full"
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={inView ? { opacity: 1, scale: 1 } : {}}
+                      transition={{ 
+                        duration: 0.3, 
+                        delay: index * 0.1 + tagIndex * 0.05 
+                      }}
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs rounded-full cursor-default"
                     >
                       {tag}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
