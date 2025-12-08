@@ -42,6 +42,7 @@ export default function CursorTrail() {
 
     window.addEventListener('mousemove', handleMouseMove)
 
+    let animationFrameId: number
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -63,7 +64,7 @@ export default function CursorTrail() {
         }
       })
 
-      requestAnimationFrame(animate)
+      animationFrameId = requestAnimationFrame(animate)
     }
 
     animate()
@@ -71,6 +72,7 @@ export default function CursorTrail() {
     return () => {
       window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('mousemove', handleMouseMove)
+      cancelAnimationFrame(animationFrameId)
     }
   }, [])
 
