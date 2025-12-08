@@ -2,48 +2,147 @@
 
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Mail, Linkedin, Github, Send } from 'lucide-react'
+import { Mail, Linkedin, Github, Send, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
+import { useToast } from './useToast'
+import ToastContainer from './Toast'
+
+interface ValidationErrors {
+  name?: string
+  email?: string
+  message?: string
+}
 
 export default function Contact() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+  const { toasts, success, error, removeToast } = useToast()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
   })
+  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
-      alert('Thank you for your message! I will get back to you soon.')
-      setFormData({ name: '', email: '', message: '' })
-    }, 1000)
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const validateField = (name: string, value: string): string | undefined => {
+    switch (name) {
+      case 'name':
+        if (!value.trim()) {
+          return 'Name is required'
+        }
+        if (value.trim().length < 2) {
+          return 'Name must be at least 2 characters'
+        }
+        if (value.trim().length > 50) {
+          return 'Name must be less than 50 characters'
+        }
+        if (!/^[a-zA-Z\s'-]+$/.test(value.trim())) {
+          return 'Name can only contain letters, spaces, hyphens, and apostrophes'
+        }
+        return undefined
+
+      case 'email':
+        if (!value.trim()) {
+          return 'Email is required'
+        }
+        if (!validateEmail(value.trim())) {
+          return 'Please enter a valid email address'
+        }
+        return undefined
+
+      case 'message':
+        if (!value.trim()) {
+          return 'Message is required'
+        }
+        if (value.trim().length < 10) {
+          return 'Message must be at least 10 characters'
+        }
+        if (value.trim().length > 1000) {
+          return 'Message must be less than 1000 characters'
+        }
+        return undefined
+
+      default:
+        return undefined
+    }
+  }
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setTouched((prev) => ({ ...prev, [name]: true }))
+    const error = validateField(name, value)
+    setErrors((prev) => ({ ...prev, [name]: error }))
   }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     })
+
+    // Real-time validation for touched fields
+    if (touched[name]) {
+      const error = validateField(name, value)
+      setErrors((prev) => ({ ...prev, [name]: error }))
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validate all fields
+    const newErrors: ValidationErrors = {}
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key as keyof typeof formData])
+      if (error) {
+        newErrors[key as keyof ValidationErrors] = error
+      }
+      setTouched((prev) => ({ ...prev, [key]: true }))
+    })
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      error('Please fix the errors in the form before submitting.')
+      return
+    }
+
+    setIsSubmitting(true)
+    
+    // Simulate form submission
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      success('Thank you for your message! I will get back to you soon. 🚀', 6000)
+      setFormData({ name: '', email: '', message: '' })
+      setErrors({})
+      setTouched({})
+    } catch (err) {
+      error('Something went wrong. Please try again later.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <section
-      id="contact"
-      ref={ref}
-      className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900/50"
-    >
-      <div className="max-w-7xl mx-auto">
+    <>
+      <ToastContainer toasts={toasts} onClose={removeToast} />
+      <section
+        id="contact"
+        ref={ref}
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900/50 relative"
+      >
+        <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -148,6 +247,7 @@ export default function Contact() {
           >
             <form
               onSubmit={handleSubmit}
+              noValidate
               className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl"
             >
               <div className="space-y-6">
@@ -156,19 +256,50 @@ export default function Contact() {
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Name
+                    Name <span className="text-red-500">*</span>
                   </label>
-                  <motion.input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all"
-                    placeholder="Your Name"
-                    whileFocus={{ scale: 1.02, borderColor: 'rgb(59, 130, 246)' }}
-                  />
+                  <div className="relative">
+                    <motion.input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={`w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all ${
+                        errors.name
+                          ? 'border-red-500 dark:border-red-500'
+                          : touched.name && !errors.name
+                          ? 'border-green-500 dark:border-green-500'
+                          : 'border-gray-300 dark:border-gray-600'
+                      }`}
+                      placeholder="Your Name"
+                      whileFocus={{ scale: 1.02 }}
+                    />
+                    {touched.name && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                      >
+                        {errors.name ? (
+                          <XCircle className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        )}
+                      </motion.div>
+                    )}
+                  </div>
+                  {errors.name && touched.name && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-1 text-sm text-red-500 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.name}
+                    </motion.p>
+                  )}
                 </div>
 
                 <div>
@@ -176,39 +307,108 @@ export default function Contact() {
                     htmlFor="email"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
-                    Email
+                    Email <span className="text-red-500">*</span>
                   </label>
-                  <motion.input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all"
-                    placeholder="your.email@example.com"
-                    whileFocus={{ scale: 1.02, borderColor: 'rgb(59, 130, 246)' }}
-                  />
+                  <div className="relative">
+                    <motion.input
+                      type="text"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      autoComplete="email"
+                      className={`w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all ${
+                        errors.email
+                          ? 'border-red-500 dark:border-red-500'
+                          : touched.email && !errors.email
+                          ? 'border-green-500 dark:border-green-500'
+                          : 'border-gray-300 dark:border-gray-600'
+                      }`}
+                      placeholder="your.email@example.com"
+                      whileFocus={{ scale: 1.02 }}
+                    />
+                    {touched.email && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                      >
+                        {errors.email ? (
+                          <XCircle className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        )}
+                      </motion.div>
+                    )}
+                  </div>
+                  {errors.email && touched.email && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-1 text-sm text-red-500 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.email}
+                    </motion.p>
+                  )}
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Message
-                  </label>
-                  <motion.textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all resize-none"
-                    placeholder="Tell me about your project..."
-                    whileFocus={{ scale: 1.02, borderColor: 'rgb(59, 130, 246)' }}
-                  />
+                  <div className="flex justify-between items-center mb-2">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Message <span className="text-red-500">*</span>
+                    </label>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {formData.message.length}/1000
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <motion.textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      rows={6}
+                      maxLength={1000}
+                      className={`w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-800 dark:text-white transition-all resize-none ${
+                        errors.message
+                          ? 'border-red-500 dark:border-red-500'
+                          : touched.message && !errors.message
+                          ? 'border-green-500 dark:border-green-500'
+                          : 'border-gray-300 dark:border-gray-600'
+                      }`}
+                      placeholder="Tell me about your project..."
+                      whileFocus={{ scale: 1.02 }}
+                    />
+                    {touched.message && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute right-3 top-3"
+                      >
+                        {errors.message ? (
+                          <XCircle className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        )}
+                      </motion.div>
+                    )}
+                  </div>
+                  {errors.message && touched.message && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-1 text-sm text-red-500 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.message}
+                    </motion.p>
+                  )}
                 </div>
 
                 <motion.button
@@ -254,7 +454,8 @@ export default function Contact() {
           </motion.div>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   )
 }
 
