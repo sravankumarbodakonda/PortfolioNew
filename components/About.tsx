@@ -5,10 +5,10 @@ import { useInView } from 'react-intersection-observer'
 import { User, Award, Target, Heart } from 'lucide-react'
 
 const stats = [
-  { icon: User, label: 'Projects Completed', value: '50+' },
-  { icon: Award, label: 'Years Experience', value: '5+' },
-  { icon: Target, label: 'Happy Clients', value: '30+' },
-  { icon: Heart, label: 'Design Awards', value: '10+' },
+  { icon: User, label: 'Projects Completed', value: '10+' },
+  { icon: Award, label: 'Years Experience', value: '4+' },
+  { icon: Target, label: 'Happy Clients', value: '3+' },
+  { icon: Heart, label: 'Design Awards', value: '2+' },
 ]
 
 export default function About() {

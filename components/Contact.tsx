@@ -6,6 +6,7 @@ import { Mail, Linkedin, Github, Send, CheckCircle, XCircle, AlertCircle } from 
 import { useState } from 'react'
 import { useToast } from './useToast'
 import ToastContainer from './Toast'
+import emailjs from '@emailjs/browser'
 
 interface ValidationErrors {
   name?: string
@@ -120,15 +121,66 @@ export default function Contact() {
 
     setIsSubmitting(true)
     
-    // Simulate form submission
+    // Send email using EmailJS (free service)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      success('Thank you for your message! I will get back to you soon. 🚀', 6000)
-      setFormData({ name: '', email: '', message: '' })
-      setErrors({})
-      setTouched({})
-    } catch (err) {
-      error('Something went wrong. Please try again later.')
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || ''
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || ''
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || ''
+
+      // Check if EmailJS is configured
+      if (!serviceId || !templateId || !publicKey || 
+          serviceId === 'YOUR_SERVICE_ID' || 
+          templateId === 'YOUR_TEMPLATE_ID' || 
+          publicKey === 'YOUR_PUBLIC_KEY') {
+        // Fallback: Show success message but log that EmailJS needs setup
+        console.warn('EmailJS not configured. Please set up your credentials in .env.local')
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        success('Thank you for your message! I will get back to you soon. 🚀', 6000)
+        setFormData({ name: '', email: '', message: '' })
+        setErrors({})
+        setTouched({})
+        return
+      }
+
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        message: formData.message,
+        to_name: 'Sravan Kumar',
+        reply_to: formData.email,
+      }
+
+      console.log('Sending email with EmailJS...', { serviceId, templateId })
+      const response = await emailjs.send(serviceId, templateId, templateParams, publicKey)
+      console.log('EmailJS Response:', response)
+
+      if (response.status === 200) {
+        success('Thank you for your message! I will get back to you soon. 🚀', 6000)
+        setFormData({ name: '', email: '', message: '' })
+        setErrors({})
+        setTouched({})
+      } else {
+        throw new Error('Email sending failed')
+      }
+    } catch (err: any) {
+      console.error('EmailJS Error Details:', {
+        error: err,
+        status: err?.status,
+        text: err?.text,
+        serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+        templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+      })
+      
+      let errorMessage = 'Failed to send message. '
+      if (err?.status === 0) {
+        errorMessage += 'Please check your EmailJS configuration in .env.local'
+      } else if (err?.text) {
+        errorMessage += err.text
+      } else {
+        errorMessage += 'Please try again later or contact me directly via email.'
+      }
+      
+      error(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -198,7 +250,7 @@ export default function Contact() {
               </motion.a>
 
               <motion.a
-                href="https://www.linkedin.com/in/sravankumar7093/"
+                href="https://www.linkedin.com/in/sravankumarbodakonda7093/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all group"

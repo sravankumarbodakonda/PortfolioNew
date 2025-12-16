@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowDown, Sparkles } from 'lucide-react'
+import { ArrowDown, Sparkles, Download } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
 
 export default function Hero() {
@@ -63,11 +63,21 @@ export default function Hero() {
           >
             <motion.a
               href="#projects"
-              className="px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
               View My Work
+            </motion.a>
+            <motion.a
+              href="/resume.pdf"
+              download
+              className="px-8 py-4 bg-white dark:bg-gray-800 text-primary-500 dark:text-primary-400 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 border-2 border-primary-500"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Download className="w-5 h-5" />
+              Download Resume
             </motion.a>
             <motion.a
               href="#contact"
