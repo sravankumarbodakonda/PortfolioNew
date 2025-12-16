@@ -51,10 +51,10 @@ const experiences = [
 const education = [
   {
     id: 1,
-    degree: 'Bachelor of Science in Computer Science',
-    institution: 'University of Technology',
-    location: 'City, State',
-    period: '2014 - 2018',
+    degree: 'Masters in Computer Science and Engineering',
+    institution: 'Sacred Heart University',
+    location: 'Fairfield, Connecticut',
+    period: 'January 2024 - March 2025',
     description: 'Graduated with honors. Focused on software engineering, database systems, and web development.',
   },
 ]
