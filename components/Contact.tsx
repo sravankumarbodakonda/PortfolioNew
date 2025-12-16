@@ -6,6 +6,7 @@ import { Mail, Linkedin, Github, Send, CheckCircle, XCircle, AlertCircle } from 
 import { useState } from 'react'
 import { useToast } from './useToast'
 import ToastContainer from './Toast'
+import { useSound } from './SoundProvider'
 import emailjs from '@emailjs/browser'
 
 interface ValidationErrors {
@@ -20,6 +21,7 @@ export default function Contact() {
     threshold: 0.1,
   })
   const { toasts, success, error, removeToast } = useToast()
+  const { playSound } = useSound()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -115,6 +117,7 @@ export default function Contact() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      playSound('error')
       error('Please fix the errors in the form before submitting.')
       return
     }
@@ -155,6 +158,7 @@ export default function Contact() {
       console.log('EmailJS Response:', response)
 
       if (response.status === 200) {
+        playSound('success')
         success('Thank you for your message! I will get back to you soon. 🚀', 6000)
         setFormData({ name: '', email: '', message: '' })
         setErrors({})
@@ -235,6 +239,8 @@ export default function Contact() {
                 href="mailto:bodakondasravankumar@gmail.com"
                 className="flex items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all group"
                 whileHover={{ x: 5, scale: 1.02 }}
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => playSound('click')}
               >
                 <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg mr-4 group-hover:bg-primary-500 group-hover:text-white transition-colors">
                   <Mail className="w-6 h-6 text-primary-500 group-hover:text-white" />
@@ -275,6 +281,8 @@ export default function Contact() {
                 rel="noopener noreferrer"
                 className="flex items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all group"
                 whileHover={{ x: 5, scale: 1.02 }}
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => playSound('click')}
               >
                 <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg mr-4 group-hover:bg-primary-500 group-hover:text-white transition-colors">
                   <Github className="w-6 h-6 text-primary-500 group-hover:text-white" />
@@ -469,6 +477,8 @@ export default function Contact() {
                   className="w-full px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
                   whileHover={{ scale: 1.02, boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4)' }}
                   whileTap={{ scale: 0.98 }}
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => !isSubmitting && playSound('click')}
                 >
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-purple-600 to-primary-500"

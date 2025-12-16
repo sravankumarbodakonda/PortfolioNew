@@ -3,12 +3,14 @@
 import { motion } from 'framer-motion'
 import { ArrowDown, Sparkles, Download } from 'lucide-react'
 import { useInView } from 'react-intersection-observer'
+import { useSound } from './SoundProvider'
 
 export default function Hero() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+  const { playSound } = useSound()
 
   return (
     <section
@@ -66,15 +68,19 @@ export default function Hero() {
               className="px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              onMouseEnter={() => playSound('hover')}
+              onClick={() => playSound('click')}
             >
               View My Work
             </motion.a>
             <motion.a
-              href="/resume.pdf"
-              download
+              href="/SravanBodakonda_SoftwareEngineer.pdf"
+              download="SravanBodakonda_Resume.pdf"
               className="px-8 py-4 bg-white dark:bg-gray-800 text-primary-500 dark:text-primary-400 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2 border-2 border-primary-500"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              onMouseEnter={() => playSound('hover')}
+              onClick={() => playSound('pop')}
             >
               <Download className="w-5 h-5" />
               Download Resume
@@ -84,6 +90,8 @@ export default function Hero() {
               className="px-8 py-4 border-2 border-primary-500 text-primary-500 dark:text-primary-400 rounded-full font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              onMouseEnter={() => playSound('hover')}
+              onClick={() => playSound('click')}
             >
               Get In Touch
             </motion.a>

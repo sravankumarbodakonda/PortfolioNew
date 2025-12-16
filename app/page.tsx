@@ -10,7 +10,6 @@ import Navigation from '@/components/Navigation'
 import ParticleBackground from '@/components/ParticleBackground'
 import FloatingElements from '@/components/FloatingElements'
 import CursorTrail from '@/components/CursorTrail'
-import Testimonials from '@/components/Testimonials'
 import Experience from '@/components/Experience'
 import ScrollToTop from '@/components/ScrollToTop'
 
@@ -36,7 +35,6 @@ export default function Home() {
       <Experience />
       <Projects />
       <Skills />
-      <Testimonials />
       <Contact />
       <ScrollToTop />
     </main>

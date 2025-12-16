@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUp } from 'lucide-react'
+import { useSound } from './SoundProvider'
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false)
+  const { playSound } = useSound()
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -24,6 +26,7 @@ export default function ScrollToTop() {
   }, [])
 
   const scrollToTop = () => {
+    playSound('whoosh')
     window.scrollTo({
       top: 0,
       behavior: 'smooth',

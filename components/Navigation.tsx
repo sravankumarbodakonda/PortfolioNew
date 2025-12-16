@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Moon, Sun } from 'lucide-react'
+import { Menu, X, Moon, Sun, Volume2, VolumeX } from 'lucide-react'
 import { useTheme } from './ThemeProvider'
+import { useSound } from './SoundProvider'
 import Logo from './Logo'
 
 const navItems = [
@@ -12,7 +13,6 @@ const navItems = [
   { name: 'Experience', href: '#experience' },
   { name: 'Projects', href: '#projects' },
   { name: 'Skills', href: '#skills' },
-  { name: 'Testimonials', href: '#testimonials' },
   { name: 'Contact', href: '#contact' },
 ]
 
@@ -20,6 +20,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
+  const { soundsEnabled, toggleSounds, playSound } = useSound()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,13 +52,34 @@ export default function Navigation() {
                 href={item.href}
                 className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors relative group"
                 whileHover={{ y: -2 }}
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => playSound('click')}
               >
                 {item.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300" />
               </motion.a>
             ))}
             <motion.button
-              onClick={toggleTheme}
+              onClick={() => {
+                toggleSounds()
+                playSound('click')
+              }}
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+              whileHover={{ scale: 1.1, rotate: 15 }}
+              whileTap={{ scale: 0.9 }}
+              title={soundsEnabled ? 'Disable sounds' : 'Enable sounds'}
+            >
+              {soundsEnabled ? (
+                <Volume2 className="w-5 h-5 text-primary-500" />
+              ) : (
+                <VolumeX className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              )}
+            </motion.button>
+            <motion.button
+              onClick={() => {
+                toggleTheme()
+                playSound('click')
+              }}
               className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
@@ -73,7 +95,25 @@ export default function Navigation() {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
             <motion.button
-              onClick={toggleTheme}
+              onClick={() => {
+                toggleSounds()
+                playSound('click')
+              }}
+              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800"
+              whileTap={{ scale: 0.9 }}
+              title={soundsEnabled ? 'Disable sounds' : 'Enable sounds'}
+            >
+              {soundsEnabled ? (
+                <Volume2 className="w-5 h-5 text-primary-500" />
+              ) : (
+                <VolumeX className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              )}
+            </motion.button>
+            <motion.button
+              onClick={() => {
+                toggleTheme()
+                playSound('click')
+              }}
               className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800"
               whileTap={{ scale: 0.9 }}
             >
@@ -84,7 +124,10 @@ export default function Navigation() {
               )}
             </motion.button>
             <motion.button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={() => {
+                setIsMobileMenuOpen(!isMobileMenuOpen)
+                playSound('click')
+              }}
               className="p-2 rounded-lg bg-gray-200 dark:bg-gray-800"
               whileTap={{ scale: 0.9 }}
             >
@@ -112,9 +155,13 @@ export default function Navigation() {
                 <motion.a
                   key={item.name}
                   href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    playSound('click')
+                  }}
                   className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                   whileHover={{ x: 5 }}
+                  onMouseEnter={() => playSound('hover')}
                 >
                   {item.name}
                 </motion.a>

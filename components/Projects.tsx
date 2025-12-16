@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { ExternalLink, Github } from 'lucide-react'
 import { useState } from 'react'
+import { useSound } from './SoundProvider'
 
 const projects = [
   {
@@ -68,6 +69,7 @@ export default function Projects() {
     threshold: 0.1,
   })
   const [hoveredId, setHoveredId] = useState<number | null>(null)
+  const { playSound } = useSound()
 
   return (
     <section
@@ -100,7 +102,10 @@ export default function Projects() {
               animate={inView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="group relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all"
-              onMouseEnter={() => setHoveredId(project.id)}
+              onMouseEnter={() => {
+                setHoveredId(project.id)
+                playSound('hover')
+              }}
               onMouseLeave={() => setHoveredId(null)}
               whileHover={{ y: -10, scale: 1.02 }}
               style={{ perspective: 1000 }}
@@ -125,6 +130,8 @@ export default function Projects() {
                     className="p-3 bg-white rounded-full hover:bg-primary-500 hover:text-white transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => playSound('click')}
+                    onMouseEnter={() => playSound('hover')}
                   >
                     <ExternalLink className="w-5 h-5" />
                   </motion.a>
@@ -133,6 +140,8 @@ export default function Projects() {
                     className="p-3 bg-white rounded-full hover:bg-primary-500 hover:text-white transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => playSound('click')}
+                    onMouseEnter={() => playSound('hover')}
                   >
                     <Github className="w-5 h-5" />
                   </motion.a>
